@@ -1,5 +1,6 @@
 import { useContext, useEffect, useState } from "react";
 import { AuthContext } from "../../providers/AuthProvider";
+import BookingRow from "./BookingRow";
 
 
 const Bookings = () => {
@@ -12,7 +13,47 @@ const Bookings = () => {
         fetch(url)
             .then(res => res.json())
             .then(data => setBookings(data))
-    }, [])
+    }, [url]);
+
+    const handleDelete = id => {
+        const proceed = confirm('Are you sure you want to delete');
+        if (proceed) {
+            fetch(`http://localhost:5000/bookings/${id}`, {
+                method: 'DELETE'
+            })
+                .then(res => res.json())
+                .then(data => {
+                    console.log(data);
+                    if (data.deletedCount > 0) {
+                        alert('deleted successfully');
+                        const remaining = bookings.filter(booking => booking._id !== id);
+                        setBookings(remaining);
+                    }
+                })
+        }
+    }
+
+    const handleConfirmed = id => {
+        fetch(`http://localhost:5000/bookings/${id}`, {
+            method: 'PATCH',
+            headers: {
+                'content-type': 'application/json'
+            },
+            body: JSON.stringify({ status: 'confirm' })
+        })
+            .then(res => res.json())
+            .then(data => {
+                console.log(data);
+                if (data.modifiedCount > 0) {
+                    // update state
+                    const remaining = bookings.filter(booking => booking._id !== id);
+                    const updated = bookings.find(booking => booking._id === id);
+                    updated.status = 'confirm'
+                    const newBookings = [ updated, ...remaining]
+                    setBookings(newBookings);
+                }
+            })
+    }
 
     return (
         <div>
@@ -27,144 +68,24 @@ const Bookings = () => {
                                     <input type="checkbox" className="checkbox" />
                                 </label>
                             </th>
-                            <th>Name</th>
-                            <th>Job</th>
-                            <th>Favorite Color</th>
-                            <th></th>
+                            <th>Image</th>
+                            <th>Service</th>
+                            <th>Date</th>
+                            <th>Price</th>
+                            <th>Status</th>
                         </tr>
                     </thead>
                     <tbody>
-                        {/* row 1 */}
-                        <tr>
-                            <th>
-                                <label>
-                                    <input type="checkbox" className="checkbox" />
-                                </label>
-                            </th>
-                            <td>
-                                <div className="flex items-center gap-3">
-                                    <div className="avatar">
-                                        <div className="mask mask-squircle w-12 h-12">
-                                            <img src="https://img.daisyui.com/tailwind-css-component-profile-2@56w.png" alt="Avatar Tailwind CSS Component" />
-                                        </div>
-                                    </div>
-                                    <div>
-                                        <div className="font-bold">Hart Hagerty</div>
-                                        <div className="text-sm opacity-50">United States</div>
-                                    </div>
-                                </div>
-                            </td>
-                            <td>
-                                Zemlak, Daniel and Leannon
-                                <br />
-                                <span className="badge badge-ghost badge-sm">Desktop Support Technician</span>
-                            </td>
-                            <td>Purple</td>
-                            <th>
-                                <button className="btn btn-ghost btn-xs">details</button>
-                            </th>
-                        </tr>
-                        {/* row 2 */}
-                        <tr>
-                            <th>
-                                <label>
-                                    <input type="checkbox" className="checkbox" />
-                                </label>
-                            </th>
-                            <td>
-                                <div className="flex items-center gap-3">
-                                    <div className="avatar">
-                                        <div className="mask mask-squircle w-12 h-12">
-                                            <img src="https://img.daisyui.com/tailwind-css-component-profile-3@56w.png" alt="Avatar Tailwind CSS Component" />
-                                        </div>
-                                    </div>
-                                    <div>
-                                        <div className="font-bold">Brice Swyre</div>
-                                        <div className="text-sm opacity-50">China</div>
-                                    </div>
-                                </div>
-                            </td>
-                            <td>
-                                Carroll Group
-                                <br />
-                                <span className="badge badge-ghost badge-sm">Tax Accountant</span>
-                            </td>
-                            <td>Red</td>
-                            <th>
-                                <button className="btn btn-ghost btn-xs">details</button>
-                            </th>
-                        </tr>
-                        {/* row 3 */}
-                        <tr>
-                            <th>
-                                <label>
-                                    <input type="checkbox" className="checkbox" />
-                                </label>
-                            </th>
-                            <td>
-                                <div className="flex items-center gap-3">
-                                    <div className="avatar">
-                                        <div className="mask mask-squircle w-12 h-12">
-                                            <img src="https://img.daisyui.com/tailwind-css-component-profile-4@56w.png" alt="Avatar Tailwind CSS Component" />
-                                        </div>
-                                    </div>
-                                    <div>
-                                        <div className="font-bold">Marjy Ferencz</div>
-                                        <div className="text-sm opacity-50">Russia</div>
-                                    </div>
-                                </div>
-                            </td>
-                            <td>
-                                Rowe-Schoen
-                                <br />
-                                <span className="badge badge-ghost badge-sm">Office Assistant I</span>
-                            </td>
-                            <td>Crimson</td>
-                            <th>
-                                <button className="btn btn-ghost btn-xs">details</button>
-                            </th>
-                        </tr>
-                        {/* row 4 */}
-                        <tr>
-                            <th>
-                                <label>
-                                    <input type="checkbox" className="checkbox" />
-                                </label>
-                            </th>
-                            <td>
-                                <div className="flex items-center gap-3">
-                                    <div className="avatar">
-                                        <div className="mask mask-squircle w-12 h-12">
-                                            <img src="https://img.daisyui.com/tailwind-css-component-profile-5@56w.png" alt="Avatar Tailwind CSS Component" />
-                                        </div>
-                                    </div>
-                                    <div>
-                                        <div className="font-bold">Yancy Tear</div>
-                                        <div className="text-sm opacity-50">Brazil</div>
-                                    </div>
-                                </div>
-                            </td>
-                            <td>
-                                Wyman-Ledner
-                                <br />
-                                <span className="badge badge-ghost badge-sm">Community Outreach Specialist</span>
-                            </td>
-                            <td>Indigo</td>
-                            <th>
-                                <button className="btn btn-ghost btn-xs">details</button>
-                            </th>
-                        </tr>
+                        {
+                            bookings.map(booking =>
+                                <BookingRow
+                                    key={booking._id}
+                                    booking={booking}
+                                    handleDelete={handleDelete}
+                                    handleConfirmed={handleConfirmed}>
+                                </BookingRow>)
+                        }
                     </tbody>
-                    {/* foot */}
-                    <tfoot>
-                        <tr>
-                            <th></th>
-                            <th>Name</th>
-                            <th>Job</th>
-                            <th>Favorite Color</th>
-                            <th></th>
-                        </tr>
-                    </tfoot>
 
                 </table>
             </div>
